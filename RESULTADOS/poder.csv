@@ -1,0 +1,7 @@
+"","SNP_asociados","SNP_realmente_asociados","Falso_positivos","PODER"
+"blink",49,48,1,0.96
+"FarmCPU",31,28,3,0.56
+"MLMM",32,32,0,0.64
+"SUPER",30,28,2,0.56
+"MLM",26,24,2,0.48
+"GLM",30,26,4,0.52
