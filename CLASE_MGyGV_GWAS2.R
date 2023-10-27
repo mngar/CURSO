@@ -1,3 +1,6 @@
+# En la clase hubo aspectos de GAPIT que no funcionaron debido a cambio en otros paquetes de los que dependia, en la clase del 26/10 hicimos cambios
+# en el código para salvar esos inconvenientes
+
 #clase MGyGV
 #GWAS
 
@@ -52,8 +55,12 @@ simulN(Nind, Nmarkers, Nqtl, Esigma, Pmean, Perror)
 geno.map <- nsimout$geno[1:1000,]
 pheno.map <- nsimout$pheno[1:1000]
 dim(pheno.map) <- c(1000,1)
+colnames(geno.map) <- c(paste("M", 1:ncol(geno.map),sep = ""))
+rownames(geno.map) <- c(paste("IND", 1:(nrow(geno.map)),sep = ""))
 
 # Poblacion de validacion
+
+
 geno.val <- nsimout$geno[1001:nrow(nsimout$geno),]
 pheno.val <- nsimout$pheno[1001:nrow(nsimout$pheno)]
 colnames(geno.val) <- c(paste("M", 1:ncol(geno.val),sep = ""))
@@ -147,8 +154,8 @@ lillie.test(x = feno$PHENO)
 ## GWAS ##
 ##########
 #setear el directorio apropiado para los archivos de salida
-setwd("D:/MGyGV/R/GWAS")
-setwd("D:/prueba")
+#setwd("D:/MGyGV/R/GWAS")
+setwd("D:/PRUEBA2")
 
 #GWAS CON DISTINTOS MODELOS
 myGAPIT <- GAPIT(
@@ -163,6 +170,99 @@ myGAPIT <- GAPIT(
   file.output=T,
   Geno.View.output=FALSE
 )
+#Debido, aparentemente, a la modificacion de una de las dependencias aparece un error y no corre las seis metodologías en una unica corrida.
+#Jiabo Wang, autor de GAPIT está al tanto y lo está corrigiendo. 
+
+#Para salvar este error hay que correr de a una:
+
+myGAPIT <- GAPIT(
+  Y=feno,
+  GD=myGD,
+  GM=map,
+  model=c("GLM"),
+  PCA.total=0,                                          
+  Inter.Plot=TRUE,                                      
+  Multiple_analysis=TRUE,                               
+  PCA.3d=TRUE,                                          
+  file.output=T,
+  Geno.View.output=FALSE,
+  Phenotype.View= FALSE,
+)
+
+myGAPIT <- GAPIT(
+  Y=feno,
+  GD=myGD,
+  GM=map,
+  model=c("MLM"),
+  PCA.total=0,                                          
+  Inter.Plot=TRUE,                                      
+  Multiple_analysis=TRUE,                               
+  PCA.3d=TRUE,                                          
+  file.output=T,
+  Geno.View.output=FALSE,
+  Phenotype.View= FALSE,
+)
+
+myGAPIT <- GAPIT(
+  Y=feno,
+  GD=myGD,
+  GM=map,
+  model=c("SUPER"),
+  PCA.total=0,                                          
+  Inter.Plot=TRUE,                                      
+  Multiple_analysis=TRUE,                               
+  PCA.3d=TRUE,                                          
+  file.output=T,
+  Geno.View.output=FALSE,
+  Phenotype.View= FALSE,
+)
+
+myGAPIT <- GAPIT(
+  Y=feno,
+  GD=myGD,
+  GM=map,
+  model=c("MLM"),
+  PCA.total=0,                                          
+  Inter.Plot=TRUE,                                      
+  Multiple_analysis=TRUE,                               
+  PCA.3d=TRUE,                                          
+  file.output=T,
+  Geno.View.output=FALSE,
+  Phenotype.View= FALSE,
+)
+
+myGAPIT <- GAPIT(
+  Y=feno,
+  GD=myGD,
+  GM=map,
+  model=c("FarmCPU"),
+  PCA.total=0,                                          
+  Inter.Plot=TRUE,                                      
+  Multiple_analysis=TRUE,                               
+  PCA.3d=TRUE,                                          
+  file.output=T,
+  Geno.View.output=FALSE,
+  Phenotype.View= FALSE,
+)
+
+myGAPIT <- GAPIT(
+  Y=feno,
+  GD=myGD,
+  GM=map,
+  model=c("Blink"),
+  PCA.total=0,                                          
+  Inter.Plot=TRUE,                                      
+  Multiple_analysis=TRUE,                               
+  PCA.3d=TRUE,                                          
+  file.output=T,
+  Geno.View.output=FALSE,
+  Phenotype.View= FALSE,
+)
+
+
+
+
+
 
 
 #Comparar marcadores asociados con los QTLs "reales"
@@ -258,24 +358,26 @@ final
 fit.glm <- glm(feno$PHENO ~ population[,c(5,10,50)])
 # colocando entre los parentesis los nombres de los marcadores asociados o las columnas donde se ubican estos en la matriz de genotipos.
 
-#Pero tambien cada salida de GAPIT contiene el efecto asociado a cada marcador
-
-efectos = 
+#Pero tambien cada salida de GAPIT contiene el efecto asociado a cada marcador (utilizamos los que son significativos)
+blink.1 = read.csv("GAPIT.Association.PVE.BLINK.PHENO.csv", header = T)
+efectos = blink.1[,6]
  media = mean(feno$PHENO) 
+ blink.asociados = blink.1[,1]
 
-  for (i in 1:Nqtl) {
-        Term <- x[, QTN[i]] * efectos[i]
+  for (i in 1:46) {
+        Term <- geno.val[, blink.asociados[i]] * efectos[i]
         assign(paste0("Term", i), Term)
     }
     t2 <- 0
-    for (i in 1:Nqtl) {
+    for (i in 1:46) {
         t1 <- get(paste0("Term", i))
         t2 <- t1 + t2
     }
     y <- media + t2 
 
 
-
+# o ajustamos una nueva regresion lineal con esos marcadores:
+fit.glm <- glm(feno$PHENO ~ population[,blink.asociados])
 
 
 
