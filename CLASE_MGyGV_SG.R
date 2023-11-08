@@ -73,3 +73,85 @@ setwd("D:/MGyGV/R/SG")
 
 
 rrblup(population, feno$PHENO, 10, 90, "MGyGV")
+
+
+#los archivos de salida los podemos visualizar en Excel o en R
+
+presicion <- read.csv("MGyGV_salida_PRECISION_SG.csv", header = FALSE)
+efectos <- read.csv("MGyGV_SALIDA_EFECTOS_RR.csv", header = FALSE)
+obspred <- read.csv("MGyGV_observado_vs_predicho.csv", header = FALSE)
+index <- read.csv("MGyGV_Index.csv", header = FALSE)
+
+# presicion es la correlacion entre los valores predichos y observados
+presicion
+boxplot(presicion)
+
+#aqui tenemos los efectos para cada uno de los marcadores
+head(efectos)
+#tomamos los de la primer validacion cruzada
+datas = efectos[1:10000,]
+colnames(datas) <- c("fold", "marker", "efecto", "efectoabs")
+datas <- datas[order(-datas$efectoabs),]
+#al graficar podemos comprobar que en RR-BLUP los efectos son muestreados desde una distribucion normal
+plot(1:10000,datas$efecto)
+#también podemos corroborar que asigne un mayor efecto absoluto a los marcadores que estan asociados a un QTL
+head(datas)
+head(QTL)
+
+
+# valores observados vs. predichos
+head(obspred)
+plot(obspred$V2,obspred$V3)                                        h
+plot(obspred$V2[1:100],obspred$V3[1:100])
+
+#coloreo los individuos con valores mayores a la media poblacional para visualizar como se compone lo que estoy seleccionando     
+data<- obspred[1:100,2:3]
+colnames(data) = c("obs","pred")
+#color por defecto
+data$Colour="black"
+# colores segun valor
+data$Colour[data$obs>mean(feno$PHENO)]="green"
+data$Colour[data$obs<mean(feno$PHENO)]="red"
+# graficar
+plot(data$obs,data$pred, xlim=c(15,35), col=data$Colour, ylim=c(22,28))
+
+
+#en azul los que seleccionaria si hiciera un corte en el 25% superior
+data<- obspred[1:100,2:3]
+colnames(data) = c("obs","pred")
+#color por defecto
+data$Colour="black"
+# colores segun valor
+data$Colour[data$obs>mean(feno$PHENO)]="green"
+data$Colour[data$obs<mean(feno$PHENO)]="red"
+data$Colour[data$pred>quantile(data$pred, c(0.75), type = 6)]="blue"
+# graficar
+plot(data$obs,data$pred, xlim=c(15,35), col=data$Colour, ylim=c(22,28))
+
+
+
+#en azul los que seleccionaria si hiciera un corte en el 25% superior, ahora en verde el 25% superior real
+data<- obspred[1:100,2:3]
+colnames(data) = c("obs","pred")
+#color por defecto
+data$Colour="black"
+# colores segun valor
+data$Colour[data$obs>quantile(feno$PHENO, c(0.75), type = 6)]="green"
+data$Colour[data$obs<mean(feno$PHENO)]="red"
+data$Colour[data$pred>quantile(data$pred, c(0.75), type = 6)]="blue"
+# graficar
+plot(data$obs,data$pred, xlim=c(15,35), col=data$Colour, ylim=c(22,28))
+
+
+sum(data$Colour == "blue")
+
+data[data$Colour == "blue",]
+
+sum(data[data$Colour == "blue",]$obs>quantile(feno$PHENO, c(0.75), type = 6))
+sum(data[data$Colour == "blue",]$obs<mean(feno$PHENO))
+
+sum(data$obs>quantile(feno$PHENO, c(0.75), type = 6))
+
+eficiencia = sum(data[data$Colour == "blue",]$obs>quantile(feno$PHENO, c(0.75), type = 6))/sum(data$obs>quantile(feno$PHENO, c(0.75), type = 6))*100
+
+
