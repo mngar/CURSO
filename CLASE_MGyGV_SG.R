@@ -72,19 +72,19 @@ map <- data.frame (SNP = colnames(population),
 setwd("D:/MGyGV/R/SG")
 
 
-rrblup(population, feno$PHENO, 10, 90, "MGyGV")
+rrblup(population, feno$PHENO, 1, 90, "MGyGV")
 
 
 #los archivos de salida los podemos visualizar en Excel o en R
 
-presicion <- read.csv("MGyGV_salida_PRECISION_SG.csv", header = FALSE)
+precision <- read.csv("MGyGV_salida_PRECISION_SG.csv", header = FALSE)
 efectos <- read.csv("MGyGV_SALIDA_EFECTOS_RR.csv", header = FALSE)
 obspred <- read.csv("MGyGV_observado_vs_predicho.csv", header = FALSE)
 index <- read.csv("MGyGV_Index.csv", header = FALSE)
 
-# presicion es la correlacion entre los valores predichos y observados
-presicion
-boxplot(presicion)
+# precision es la correlacion entre los valores predichos y observados
+precision
+boxplot(precision)
 
 #aqui tenemos los efectos para cada uno de los marcadores
 head(efectos)
@@ -101,7 +101,7 @@ head(QTL)
 
 # valores observados vs. predichos
 head(obspred)
-plot(obspred$V2,obspred$V3)                                        h
+plot(obspred$V2,obspred$V3)
 plot(obspred$V2[1:100],obspred$V3[1:100])
 
 #coloreo los individuos con valores mayores a la media poblacional para visualizar como se compone lo que estoy seleccionando     
@@ -154,4 +154,5 @@ sum(data$obs>quantile(feno$PHENO, c(0.75), type = 6))
 
 eficiencia = sum(data[data$Colour == "blue",]$obs>quantile(feno$PHENO, c(0.75), type = 6))/sum(data$obs>quantile(feno$PHENO, c(0.75), type = 6))*100
 
+prop.malos = sum(data[data$Colour == "blue",]$obs<mean(feno$PHENO)/sum(data$obs>quantile(feno$PHENO, c(0.75), type = 6))*100
 
